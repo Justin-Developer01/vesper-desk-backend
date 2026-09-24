@@ -1,0 +1,9 @@
+services:
+  backend:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8787:8787"
+    environment:
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+      PORT: 8787
