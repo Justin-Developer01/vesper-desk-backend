@@ -1,7 +1,11 @@
 import Fastify from 'fastify'
 import { downloadRoutes } from './routes/download.js'
 
-const app = Fastify({ logger: true })
+// trustProxy: reverse-proxied behind Caddy, which terminates TLS and sets
+// X-Forwarded-Proto — without this, req.protocol/req.hostname would report
+// the plain-HTTP connection Caddy makes to this server, not the real
+// https:// request a visitor made.
+const app = Fastify({ logger: true, trustProxy: true })
 
 app.get('/healthz', async () => ({ ok: true }))
 

@@ -3,12 +3,24 @@ const RELEASES_API = 'https://api.github.com/repos/Justin-Developer01/vesper-des
 type GitHubReleaseAsset = {
   id: number
   name: string
+  size: number
 }
 
 type GitHubRelease = {
   tag_name: string
+  html_url: string
+  published_at: string
   draft: boolean
   assets: GitHubReleaseAsset[]
+}
+
+export type LatestSetupAsset = {
+  version: string
+  assetId: number
+  assetName: string
+  sizeBytes: number
+  publishedAt: string
+  notesUrl: string
 }
 
 type AuthedFetchInit = RequestInit & { redirect?: 'manual' | 'follow' | 'error' }
@@ -27,7 +39,7 @@ function githubHeaders(extra?: Record<string, string>): Record<string, string> {
  * release whose build is still uploading assets doesn't block on itself —
  * same logic as vesper-desk-web's fetchLatestRelease.
  */
-export async function findLatestSetupAsset(): Promise<{ version: string; assetId: number; assetName: string } | null> {
+export async function findLatestSetupAsset(): Promise<LatestSetupAsset | null> {
   const res = await fetch(RELEASES_API, { headers: githubHeaders() })
   if (!res.ok) throw new Error(`GitHub releases list failed: ${res.status}`)
 
@@ -36,7 +48,14 @@ export async function findLatestSetupAsset(): Promise<{ version: string; assetId
     if (release.draft) continue
     const asset = release.assets.find((a) => /Setup.*\.exe$/i.test(a.name))
     if (!asset) continue
-    return { version: release.tag_name, assetId: asset.id, assetName: asset.name }
+    return {
+      version: release.tag_name,
+      assetId: asset.id,
+      assetName: asset.name,
+      sizeBytes: asset.size,
+      publishedAt: release.published_at,
+      notesUrl: release.html_url,
+    }
   }
   return null
 }
