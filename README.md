@@ -44,12 +44,17 @@ npm run dev
 ## Deploy (Hostinger VPS)
 
 ```bash
-cp .env.example .env   # set GITHUB_TOKEN, PORT if needed
+cp .env.example .env   # set GITHUB_TOKEN, PUBLIC_ORIGIN, TRUSTED_PROXY if needed
 docker compose up -d --build
 ```
 
 Put this behind a reverse proxy (Caddy or nginx) for TLS — this service
-itself only speaks plain HTTP on `PORT` (8787 by default).
+itself only speaks plain HTTP on `PORT` (8787 by default), bound to
+`127.0.0.1` only (see `docker-compose.yml`), so the proxy must run on the
+same host unless `TRUSTED_PROXY` is also changed to match. Set
+`PUBLIC_ORIGIN` to the service's real `https://` address — `/v1/download/
+latest/info` uses it to build the download URL it returns, rather than
+trusting the request's own Host header.
 
 ## Not yet built
 
