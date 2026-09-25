@@ -3,7 +3,9 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - "8787:8787"
+      - "127.0.0.1:8787:8787"
     environment:
       GITHUB_TOKEN: ${GITHUB_TOKEN}
       PORT: 8787
+      TRUSTED_PROXY: ${TRUSTED_PROXY:-127.0.0.1}
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN}
